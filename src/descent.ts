@@ -148,6 +148,7 @@ DEBUG */
          * If G[i][j] <= 1 then it is used as a weighting on the contribution of the variance between ideal and actual separation between i and j to the goal function
          */
         constructor(x: number[][], public D: number[][], public G: number[][]= null, nodes: Node[] = []) {
+            this._nodes = nodes
             this.x = x;
             this.k = x.length; // dimensionality
             var n = this.n = x[0].length; // number of nodes
