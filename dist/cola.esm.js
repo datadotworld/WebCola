@@ -730,6 +730,10 @@ function () {
         G = null;
       }
 
+      if (nodes === void 0) {
+        nodes = [];
+      }
+
       this.D = D;
       this.G = G;
       this.threshold = 0.0001; // Parameters for grid snap stress.
@@ -742,6 +746,7 @@ function () {
       this.scaleSnapByMaxH = false;
       this.random = new PseudoRandom();
       this.project = null;
+      this._nodes = nodes;
       this.x = x;
       this.k = x.length; // dimensionality
 
