@@ -598,7 +598,7 @@ import {separateGraphs, applyPacking} from './handledisconnected'
             }
 
             this.avoidOverlaps(false);
-            this._descent = new Descent([x, y], D);
+            this._descent = new Descent([x, y], D, undefined, this._nodes);
 
             this._descent.locks.clear();
             for (var i = 0; i < n; ++i) {

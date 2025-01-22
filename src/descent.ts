@@ -1,3 +1,5 @@
+    import { Node } from './layout'
+    
     /**
      * Descent respects a collection of locks over nodes that should not move
      * @class Locks
@@ -104,6 +106,39 @@ DEBUG */
 
         public project: { (x0: number[], y0: number[], r: number[]): void }[] = null;
 
+        _nodes: Node[]
+
+        /** The dimension distance calculation (defaults to x[i][u]-x[i][v])
+         * @property dimensionDistance{(number[][], number, number, number) => number}
+         * Can be replaced with a custom function.
+         * For example replacing with (x, i, u, v) => i==0 ? (x[i][u]-x[i][v])/4 : x[i][u]-x[i][v];
+         * has the effect of making horizontal distances larger than vertical
+         * distances.
+         */
+        public static dimensionDistance(
+            x: number[][],
+            i: number,
+            u: number,
+            v: number,
+            nodes: Node[],
+        ): number {
+            //const original = x[i][u] - x[i][v]
+            let dx = x[i][u] - x[i][v]
+            const dedge =
+            i == 0
+                ? ((nodes[u]?.width || 0) + (nodes[v]?.width || 0)) / 2
+                : ((nodes[u]?.height || 0) + (nodes[v]?.height || 0)) / 2
+            if (dx > dedge) {
+            dx -= dedge
+            } else if (dx < -dedge) {
+            dx += dedge
+            } else if (dx != 0) {
+            dx /= 10
+            }
+            //console.log("DD", i, u, v, original, dedge, dx)
+            return dx
+        }
+
         /**
          * @method constructor
          * @param x {number[][]} initial coordinates for nodes
@@ -112,7 +147,7 @@ DEBUG */
          * If G[i][j] > 1 and the separation between nodes i and j is greater than their ideal distance, then there is no contribution for this pair to the goal
          * If G[i][j] <= 1 then it is used as a weighting on the contribution of the variance between ideal and actual separation between i and j to the goal function
          */
-        constructor(x: number[][], public D: number[][], public G: number[][]= null) {
+        constructor(x: number[][], public D: number[][], public G: number[][]= null, nodes: Node[] = []) {
             this.x = x;
             this.k = x.length; // dimensionality
             var n = this.n = x[0].length; // number of nodes
@@ -214,7 +249,14 @@ DEBUG */
                     while (maxDisplaces--) {
                         distanceSquared = 0;
                         for (i = 0; i < this.k; ++i) {
-                            const dx = d[i] = x[i][u] - x[i][v];
+                            //const dx = d[i] = x[i][u] - x[i][v];
+                            const dx = (d[i] = Descent.dimensionDistance(
+                                x,
+                                i,
+                                u,
+                                v,
+                                this._nodes,
+                              ))
                             distanceSquared += d2[i] = dx * dx;
                         }
                         if (distanceSquared > 1e-9) break;
